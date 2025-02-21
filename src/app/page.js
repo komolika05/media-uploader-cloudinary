@@ -1,21 +1,36 @@
-import { connectDB } from './lib/mongodb';
-import Media from '../models/Media';
+'use client';
+import { useState, useEffect } from 'react';
+import FileUpload from './components/FileUpload';
 import ShowMedia from './components/ShowMedia';
 
-export default async function Home() {
-    await connectDB();
-    
-    try {
-        const dbMedia = await Media.find({})
-            .sort({ uploadedAt: -1 })
-            .limit(100);
+export default function Home() {
+    const [activeTab, setActiveTab] = useState('upload');
+    const [media, setMedia] = useState([]);
 
-        return <ShowMedia initialMedia={dbMedia.map(media => ({
-            url: media.url,
-            name: media.name
-        }))} />;
-    } catch (error) {
-        console.error('Error fetching media:', error);
-        return <div>Error loading media</div>;
-    }
+    useEffect(() => {
+        async function fetchMedia() {
+            try {
+                const response = await fetch('/api/media'); // Fetch from API route
+                const data = await response.json();
+                setMedia(data);
+            } catch (error) {
+                console.error('Error fetching media:', error);
+            }
+        }
+        if (activeTab === 'list') {
+            fetchMedia();
+        }
+    }, [activeTab]);
+
+    return (
+        <div>
+            <h1>Media Uploader</h1>
+            <div>
+                <button onClick={() => setActiveTab('upload')}>Upload New Media</button>
+                <button onClick={() => setActiveTab('list')}>View Uploaded Media</button>
+            </div>
+            {activeTab === 'upload' && <FileUpload />}
+            {activeTab === 'list' && <ShowMedia initialMedia={media} />}
+        </div>
+    );
 }

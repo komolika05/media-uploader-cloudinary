@@ -1,16 +1,19 @@
 'use client';
+
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 
 export default function FileUpload() {
     const [file, setFile] = useState(null);
     const [uploading, setUploading] = useState(false);
-    const [uploadedUrl, setUploadedUrl] = useState('');
+    const router = useRouter();
 
     const handleFileChange = (e) => {
-        setFile(e.target.files[0]);
+        const selectedFile = e.target.files[0];
+        setFile(selectedFile);
     };
 
-    const handleSubmit = async (e) => {
+    const handleUpload = async (e) => {
         e.preventDefault();
         if (!file) return;
 
@@ -19,36 +22,43 @@ export default function FileUpload() {
         formData.append('file', file);
 
         try {
-            const response = await fetch('/api/upload', {
+            const response = await fetch('/api/media', {
                 method: 'POST',
                 body: formData
             });
 
-            const data = await response.json();
-            if (data.url) {
-                setUploadedUrl(data.url);
+            if (response.ok) {
+                alert('File uploaded successfully!');
+                setFile(null);
+                router.refresh(); // Refresh the page to show new media
+            } else {
+                const errorData = await response.json();
+                alert(`Upload failed: ${errorData.error}`);
             }
         } catch (error) {
-            console.error('Upload failed:', error);
+            console.error('Upload error:', error);
+            alert('Upload failed');
+        } finally {
+            setUploading(false);
         }
-
-        setUploading(false);
     };
 
     return (
         <div>
-            <form onSubmit={handleSubmit}>
-                <input type="file" onChange={handleFileChange} />
-                <button type="submit" className="mt-4 bg-blue-500 text-white px-4 py-2 rounded" disabled={uploading}>
+            <h2>Upload Media</h2>
+            <form onSubmit={handleUpload}>
+                <input 
+                    type="file" 
+                    onChange={handleFileChange}
+                    accept="image/*,video/*"
+                />
+                <button 
+                    type="submit" 
+                    disabled={!file || uploading}
+                >
                     {uploading ? 'Uploading...' : 'Upload'}
                 </button>
             </form>
-            {uploadedUrl && (
-                <div>
-                    <p>Uploaded Image:</p>
-                    <img src={uploadedUrl} alt="Uploaded" width={200} />
-                </div>
-            )}
         </div>
     );
 }

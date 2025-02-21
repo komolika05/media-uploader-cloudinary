@@ -12,13 +12,15 @@ export default function ShowMedia({ initialMedia }) {
             <div className="grid grid-cols-3 gap-4">
                 {mediaUrls.map((media, index) => (
                     <div key={index} className="relative w-full h-64">
-                        <Image 
-                            src={media.url} 
-                            alt={media.name || `Media ${index + 1}`} 
-                            fill 
-                            className="object-cover"
-                            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                        />
+                        {media.path && (
+                            <Image 
+                                src={media.path} 
+                                alt={media.filename || `Media ${index + 1}`} 
+                                fill 
+                                className="object-cover"
+                                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                            />
+                        )}
                     </div>
                 ))}
             </div>
