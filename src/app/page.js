@@ -1,10 +1,21 @@
-import FileUpload from "./components/FileUpload";
+import { connectDB } from './lib/mongodb';
+import Media from '../models/Media';
+import ShowMedia from './components/ShowMedia';
 
-export default function Home() {
-    return (
-        <div className="p-4 flex flex-col items-center justify-center h-screen">
-            <h1 className="text-3xl font-bold mb-4">Upload media to cloudinary</h1>
-            <FileUpload />
-        </div>
-    );
+export default async function Home() {
+    await connectDB();
+    
+    try {
+        const dbMedia = await Media.find({})
+            .sort({ uploadedAt: -1 })
+            .limit(100);
+
+        return <ShowMedia initialMedia={dbMedia.map(media => ({
+            url: media.url,
+            name: media.name
+        }))} />;
+    } catch (error) {
+        console.error('Error fetching media:', error);
+        return <div>Error loading media</div>;
+    }
 }
