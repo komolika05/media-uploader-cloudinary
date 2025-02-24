@@ -10,7 +10,7 @@ export default function Home() {
     useEffect(() => {
         async function fetchMedia() {
             try {
-                const response = await fetch('/api/media'); // Fetch from API route
+                const response = await fetch('/api/media');
                 const data = await response.json();
                 setMedia(data);
             } catch (error) {
@@ -23,10 +23,10 @@ export default function Home() {
     }, [activeTab]);
 
     return (
-        <div>
-            <h1>Media Uploader</h1>
+        <div className="flex flex-col items-center mt-10">
+            <h1 className="text-3xl font-bold mb-3">Media Uploader</h1>
             <div>
-                <button onClick={() => setActiveTab('upload')}>Upload New Media</button>
+                <button className="mr-3" onClick={() => setActiveTab('upload')}>Upload New Media</button>
                 <button onClick={() => setActiveTab('list')}>View Uploaded Media</button>
             </div>
             {activeTab === 'upload' && <FileUpload />}

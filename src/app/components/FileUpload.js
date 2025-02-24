@@ -44,8 +44,7 @@ export default function FileUpload() {
     };
 
     return (
-        <div>
-            <h2>Upload Media</h2>
+        <div className="mt-3">
             <form onSubmit={handleUpload}>
                 <input 
                     type="file" 
@@ -53,6 +52,7 @@ export default function FileUpload() {
                     accept="image/*,video/*"
                 />
                 <button 
+                    className="btn-primary bg-blue-500 py-2 px-4 rounded"
                     type="submit" 
                     disabled={!file || uploading}
                 >
